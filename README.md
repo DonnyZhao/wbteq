@@ -1,6 +1,6 @@
 # Wrapper for Teradata BTEQ Command
 
-**BTEQ** is a Teradata utility for execute BTEQ command, it supports read value from envrionment, but only for Unix/Linux platform. I could find a way to ask **BTEQ** to read %VAR% from Windows platform.
+**BTEQ** is a Teradata utility for execute BTEQ command, it supports read value from envrionment, but only for Unix/Linux platform. I could **not** find a way to ask **BTEQ** to read %VAR% from Windows platform.
 
 
 The main purpose for this **wbteq** is to define variables in the bteq scripts.
