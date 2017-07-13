@@ -1,1 +1,2 @@
-This is the change log
+13/07/2017
+- Changed the design, read from Teradata tables

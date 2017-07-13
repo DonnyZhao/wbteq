@@ -3,21 +3,58 @@
 **BTEQ** is a Teradata utility for execute BTEQ command, it supports read value from environment, but only for Unix/Linux platform. I could **not** find a way to ask **BTEQ** to read %VAR% from Windows platform.
 
 
-The main purpose for this **wbteq** is to define variables in the bteq scripts.
+## Design
+There are three tables in Teradata to store the information about BTEQ jobs. Use SQL query to get the jobs to be run, check `freq`,`is_enabled` and compare to current date/time to decided if the job to be run.
 
+This program will be scheduled as a repeated job for every 1 hour, and it invokes all other BTEQ jobs.
 
-## Sample wbteq script
-```sql
--- file name : sample_bteq.sql
-var1 = abc
-var2 = customers
+### wbteq_jobs
+- job_id `pk`
+- freq ('M','W','D')
+- day_of_month
+- day_of_week
+- hour24
+- job_name
+- job_owner
+- job_owner_email
+- is_enabled ('Y','N')
+- created_at
+- updated_at
 
--- following are normal bteq script
-.login someurl.com/userid,{password};
+### wbteq_steps
+- step_id `pk`
+- job_id `fk`
+- seq_num
+- filename
+- created_at
+- updated_at
 
-select column from {var2} where name = '{var1}';
+### wbteq_params
+- param_id `pk`
+- step_id `fk`
+- param_name
+- param_value
+
+## Usage
+```
+usage: wbteq [-h] [-l LIB] [-f FOLDER] [-d DAYS] [-v] username password
+
+BTEQ Jobs management on Windows
+
+positional arguments:
+  username              The Teradata logon name for running BTEQ(s)
+  password              The Teradata logon password for running BTEQ(s)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l LIB, --lib LIB     The library folder for WBTEQ (default _libs)
+  -f FOLDER, --folder FOLDER
+                        The working folder for WBTEQ (default _wbteq)
+  -d DAYS, --days DAYS  The # of days to keep logs/scripts (default 7)
+  -v, --version         displays the current version of wbteq
 ```
 
-```batch
-C:\>wbteq sample_bteq.sql
+This is a sample command to call the program with default
+```
+C:\>wbteq tduser tdpass
 ```
