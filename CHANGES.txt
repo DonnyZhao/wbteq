@@ -1,2 +1,9 @@
-13/07/2017
+0.0.1
+-----
 - Changed the design, read from Teradata tables
+
+0.0.2
+----
+- Added the udf.py and comm.py
+- Fix the sorting of steps
+- return a (cmd, email) from generate_scripts
