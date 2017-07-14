@@ -5,7 +5,7 @@ Welcome to the project **WBTEQ**, I supppose you are struggling with how to run 
 The purpose of this project is to make life easier to run BTEQ scripts on Windows. To test/intall/deploy **WBTEQ**, here are the basic requirement:
 
 * You need a Windows machine, and you have the permission to install `pip` package, you also need to create Envrionment Variable
-* You need the Teradata Utility installed on that machine, try to run `betq` command from console
+* You need the Teradata Utility installed on that machine, try to run `bteq` command from console
 * You have the connection detial of a Teradata server, and you have the write permission to at least one schema
 * Python 3.5+ is required, and `pyodbc` - https://github.com/mkleehammer/pyodbc is intalled
 

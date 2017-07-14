@@ -1,13 +1,13 @@
 ﻿/*
-	The table design for wbteq 
+	The table design for wbteq
 	Author: Zhong Dai <zhongdai.au@gmail.com>
 */
-database c4ustcrm;
+database <your database>;
 drop table wbteq_jobs;
-create table wbteq_jobs 
+create table wbteq_jobs
 (
 	job_id 				integer not null
-,	freq 				char(1) not null compress ('M','W','D') 
+,	freq 				char(1) not null compress ('M','W','D')
 ,	day_of_month		integer null
 ,	day_of_week			integer null
 ,	hour24				integer
