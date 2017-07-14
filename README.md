@@ -32,9 +32,11 @@ This program will be scheduled as a repeated job for every 1 hour, and it invoke
 ### wbteq_params
 - param_id `pk`
 - step_id `fk`
-- param_type ('D','P','S') D - Direct / Python / SQL
+- param_type ('D','P','S')  Direct / Python / SQL
 - param_name
 - param_value
+- created_at
+- updated_at
 
 ## Usage
 ```
