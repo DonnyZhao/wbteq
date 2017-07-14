@@ -10,6 +10,7 @@ import re
 from collections import namedtuple
 import logging
 from subprocess import call
+import pyodbc
 
 
 from . import __version__
@@ -17,12 +18,14 @@ from .udf import exec_udf
 from .comm import send_notification
 
 
-TERADATA_DSN = ""
+
 
 Job = namedtuple('Job',['job_id','job_name','job_email'])
 Step = namedtuple('Step',['job_id','step_id','filename','seq_num'])
 Param = namedtuple('Param',['step_id','param_name','param_value'])
 
+
+# Setup the logger
 logger = logging.getLogger('WBTEQ')
 logger.setLevel(logging.DEBUG)
 
@@ -32,6 +35,14 @@ formatter = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+# Build the DB connection string
+db_url = os.environ.get('WBTEQ_DB_URL','N/A')
+logger.info('Get the WBTEQ_DB_URL {}'.format(db_url))
+
+if db_url == 'N/A':
+    raise SystemExit('Please make sure WBTEQ_DB_URL has been created in Envrionment Variable')
+
+TERADATA_DSN = "DRIVER=Teradata;DBCNAME=" + db_url.strip()+ ";UID={u};PWD={p};QUIETMODE=YES"
 
 def _check_folder(folder_name):
     if not isinstance(folder_name, str):
@@ -60,8 +71,12 @@ def _delete_older_files(wf, no_of_days):
     logger.info('Delete old logs/scripts [{}] days before'.format(no_of_days))
     pass
 
-def get_all_jobs():
+def get_all_jobs(cursor):
     # TODO: to be implemented with db connection
+
+    logger.info('Running SQL Query for jobs')
+    cursor.execute('Select job_id from c4ustcrm.wbteq_jobs;')
+
     j1 = Job(1,'Job 1','job1@gmail.com')
     j2 = Job(2,'Job 2','job2@gmail.com')
     j3 = Job(3,'Job 3','job3@gmail.com') # no steps
@@ -107,10 +122,19 @@ def _check_job_files(lib_folder, files):
     else:
         raise TypeError('files must be a str or list')
 
-def build_job_def_list(lib_folder):
-    jobs = get_all_jobs()
+def build_job_def_list(lib_folder, user, password):
+    logger.info('Connecting to database ...')
+
+    conn = pyodbc.connect(TERADATA_DSN.format(u=user,p=password))
+    cursor = conn.cursor()
+
+    jobs = get_all_jobs(cursor)
     steps = get_all_steps()
     params = get_all_params()
+
+    logger.info('Closing to database ...')
+    cursor.close()
+    conn.close()
 
     job_defs = []
     for job in jobs:
@@ -238,7 +262,9 @@ def command_line_runner():
 
     # build the jobs (all json format)
     # it checks of the job file exists or not
-    jobs = build_job_def_list(_get_full_path(args['lib']))
+    jobs = build_job_def_list(_get_full_path(args['lib']),
+                              user=args['username'],
+                              password=args['password'])
 
     logger.info('[{}] valid job(s) has been found'.format(len(jobs)))
     for j in jobs:

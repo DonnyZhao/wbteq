@@ -57,6 +57,6 @@ setup(
         ]
     },
     install_requires=[
-        'requests'
+        'pyodbc'
     ],
 )

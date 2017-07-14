@@ -1,9 +1,27 @@
 # Wrapper for Teradata BTEQ Command
 
-**BTEQ** is a Teradata utility for execute BTEQ command, it supports read value from environment, but only for Unix/Linux platform. I could **not** find a way to ask **BTEQ** to read %VAR% from Windows platform.
+Welcome to the project **WBTEQ**, I supppose you are struggling with how to run BTEQ scripts on Windows platform, then you are on the right page.
+
+The purpose of this project is to make life easier to run BTEQ scripts on Windows. To test/intall/deploy **WBTEQ**, here are the basic requirement:
+
+* You need a Windows machine, and you have the permission to install `pip` package, you also need to create Envrionment Variable
+* You need the Teradata Utility installed on that machine, try to run `betq` command from console
+* You have the connection detial of a Teradata server, and you have the write permission to at least one schema
+* Python 3.5+ is required, and `pyodbc` - https://github.com/mkleehammer/pyodbc is intalled
+
+
+## How to install
+
+* The first task, create a new envrionment variable `WBTEQ_DB_URL` and the value is IP/URL to your Teradata server
+* Find the file `system_tables_ddl.sql` and execute the SQLs to create system tables on Teradata
+* Run the test case by run `python test_wbteq.py` - check if any failed
+* Install the package by `python setup.py install` (you may need the permission depends on where to be installed)
 
 
 ## Design
+
+TODO: A ER diagram is required
+
 There are three tables in Teradata to store the information about BTEQ jobs. Use SQL query to get the jobs to be run, check `freq`,`is_enabled` and compare to current date/time to decided if the job to be run.
 
 This program will be scheduled as a repeated job for every 1 hour, and it invokes all other BTEQ jobs.
