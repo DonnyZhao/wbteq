@@ -9,16 +9,19 @@ The purpose of this project is to make life easier to run BTEQ scripts on Window
 * You have the connection detial of a Teradata server, and you have the write permission to at least one schema
 * Python 3.5+ is required, and `pyodbc` - https://github.com/mkleehammer/pyodbc is intalled
 
-
 ## How to install
 
-* The first task, create a new envrionment variable `WBTEQ_DB_URL` and the value is IP/URL to your Teradata server
+* The first task, create two new envrionment variables  
+`WBTEQ_DB_NAME` - the database name you have write permission  
+`WBTEQ_DB_URL` - database URL
 * Find the file `system_tables_ddl.sql` and execute the SQLs to create system tables on Teradata
 * Run the test case by run `python test_wbteq.py` - check if any failed
 * Install the package by `python setup.py install` (you may need the permission depends on where to be installed)
 
 
-## Design
+## Design and Workflow
+
+![workflow](arts\workflow.png)
 
 TODO: A ER diagram is required
 

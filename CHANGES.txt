@@ -3,7 +3,14 @@
 - Changed the design, read from Teradata tables
 
 0.0.2
-----
+-----
 - Added the udf.py and comm.py
 - Fix the sorting of steps
 - return a (cmd, email) from generate_scripts
+
+0.1.0
+-----
+- Added the checking for all param exists in definition
+- Added the workflow.png
+- Added WBTEQ_DB_NAME to avoid hard code
+- Prepare to deploy for a real process
