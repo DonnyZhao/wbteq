@@ -22,7 +22,7 @@ from .comm import send_notification
 
 Job = namedtuple('Job',['job_id','job_name','job_email'])
 Step = namedtuple('Step',['job_id','step_id','filename','seq_num'])
-Param = namedtuple('Param',['step_id','param_type','param_name','param_value'])
+Param = namedtuple('Param',['step_id','param_name','param_value'])
 
 
 # Setup the logger
@@ -39,10 +39,15 @@ logger.addHandler(ch)
 db_url = os.environ.get('WBTEQ_DB_URL','N/A')
 logger.info('Get the WBTEQ_DB_URL {}'.format(db_url))
 
-if db_url == 'N/A':
-    raise SystemExit('Please make sure WBTEQ_DB_URL has been created in Envrionment Variable')
+db_name = os.environ.get('WBTEQ_DB_NAME','N/A')
+logger.info('Get the WBTEQ_DB_NAME {}'.format(db_name))
+
+if db_url == 'N/A' or db_name == 'N/A':
+    raise SystemExit('Please make sure WBTEQ_DB_URL / WBTEQ_DB_NAME has been created in Envrionment Variable')
+
 
 TERADATA_DSN = "DRIVER=Teradata;DBCNAME=" + db_url.strip()+ ";UID={u};PWD={p};QUIETMODE=YES"
+TERADATA_DSN = TERADATA_DSN + ";Database="+db_name
 
 def _check_folder(folder_name):
     if not isinstance(folder_name, str):
@@ -69,7 +74,18 @@ def _get_full_path(d=None):
 def _delete_older_files(wf, no_of_days):
     logger.info('Delete old logs/scripts in [{}]'.format(_get_full_path(wf)))
     logger.info('Delete old logs/scripts [{}] days before'.format(no_of_days))
-    pass
+    curr_date = datetime.now()
+    counter = 0
+    for _file in os.listdir(wf):
+        if _file.endswith('cmd') or _file.endswith('log'):
+            dt_str = _file.split('_')[-2]
+            dt_date = datetime.strptime(dt_str, "%Y%m%d")
+            delta = curr_date - dt_date
+            if delta.days >= int(no_of_days):
+                os.remove(os.path.join(wf,_file))
+                counter = counter + 1
+                logger.info('{} has been deleted'.format(_file))
+    return counter
 
 def get_all_jobs(cursor):
     """
@@ -82,7 +98,7 @@ def get_all_jobs(cursor):
                     	job_id
                     , 	job_name
                     , 	job_owner_email
-                    from c4ustcrm.wbteq_jobs
+                    from wbteq_jobs
                     where
                     	is_enabled = 'Y'
                     and freq = 'D';"""
@@ -103,7 +119,7 @@ def get_all_steps(cursor):
                     ,	job_id
                     ,	seq_num
                     ,	filename
-                    from c4ustcrm.wbteq_steps;"""
+                    from wbteq_steps;"""
 
     cursor.execute(sql_fetch_steps)
     rows = cursor.fetchall()
@@ -120,11 +136,17 @@ def get_all_params(cursor):
                     ,	param_type
                     ,	param_name
                     ,	param_value
-                    from c4ustcrm.wbteq_params;"""
+                    from wbteq_params;"""
     cursor.execute(sql_fetch_params)
     rows = cursor.fetchall()
     for row in rows:
-        p = Param(row.step_id, row.param_type, row.param_name, row.param_value)
+        if row.param_type == 'D':
+            v = row.param_value
+        elif row.param_type == 'P':
+            v = exec_udf(row.param_value)
+        elif row.param_type == 'S':
+            v = row.param_value
+        p = Param(row.step_id, row.param_name, v)
         return_params.append(p)
 
     logger.debug('run udf {}'.format(exec_udf('hello world')))
@@ -284,7 +306,8 @@ def command_line_runner():
     else:
         raise ValueError('Create folder failed')
 
-    _delete_older_files(args['folder'],args['days'])
+    no_of_deleted = _delete_older_files(_get_full_path(args['folder']),args['days'])
+    logger.info('{} file(s) have been deleted.'.format(no_of_deleted))
 
     # build the jobs (all json format)
     # it checks of the job file exists or not
