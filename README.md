@@ -21,7 +21,7 @@ The purpose of this project is to make life easier to run BTEQ scripts on Window
 
 ## Design and Workflow
 
-![workflow](arts\workflow.png)
+![workflow](arts/workflow.png)
 
 TODO: A ER diagram is required
 
