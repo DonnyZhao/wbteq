@@ -1,4 +1,9 @@
 # Wrapper for Teradata BTEQ Command
+----
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+
+
+---
 
 Welcome to the project **WBTEQ**, I supppose you are struggling with how to run BTEQ scripts on Windows platform, then you are on the right page.
 
@@ -82,3 +87,6 @@ This is a sample command to call the program with default
 ```
 C:\>wbteq tduser tdpass
 ```
+
+## License
+MIT
