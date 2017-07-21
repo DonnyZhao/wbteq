@@ -58,11 +58,26 @@ This program will be scheduled as a repeated job for every 1 hour, and it invoke
 ### wbteq_params
 - param_id `pk`
 - step_id `fk`
-- param_type ('D','P','S')  Direct / Python / SQL
+- param_type ('D','P','S')  Direct / Python (UDF) / SQL
 - param_name
 - param_value
 - created_at
 - updated_at
+
+## UDFs
+User Defined Function is a Python function to handle `param_type = 'D'` parameters. The format for `D` type is  
+`func$p1$p2`
+
+Implemented UDFs:
+
+- `month_end` is one UDF, which accepts two arguments, `fmt` and `offset`
+> fmt = 'str' --> yyyymmdd  
+> fmt = 'date' -- > cast('dd/mm/yyyy' as date format 'dd/mm/yyyy')  
+> fmt = 'month_key' -- > yyyymm  
+> The `offset` could be -1 or 1 or any integer value to control which month to be returned
+
+Example:  
+`month_end$str$0` - will get the current month end date in `yyyymmdd` format
 
 ## Usage
 ```

@@ -14,7 +14,7 @@ from string import Formatter
 
 
 from . import __version__
-from .udf import exec_udf
+from .udf import udf_call
 from .comm import send_notification
 
 
@@ -150,13 +150,13 @@ def get_all_params(cursor):
         if row.param_type == 'D':
             v = row.param_value
         elif row.param_type == 'P':
-            v = exec_udf(row.param_value)
+            v = udf_call(row.param_value)
         elif row.param_type == 'S':
             v = row.param_value
         p = Param(row.step_id, row.param_name, v)
         return_params.append(p)
 
-    logger.debug('run udf {}'.format(exec_udf('hello world')))
+
     return return_params
 
 
