@@ -19,7 +19,7 @@ The purpose of this project is to make life easier to run BTEQ scripts on Window
 * The first task, create two new envrionment variables  
 `WBTEQ_DB_NAME` - the database name you have write permission  
 `WBTEQ_DB_URL` - database URL
-* Find the file `system_tables_ddl.sql` and execute the SQLs to create system tables on Teradata
+* Find the file `system_tables_ddl.sql` and execute the SQLs to create system tables and SPs on Teradata
 * Run the test case by run `python test_wbteq.py` - check if any failed
 * Install the package by `python setup.py install` (you may need the permission depends on where to be installed)
 
@@ -78,6 +78,43 @@ Implemented UDFs:
 
 Example:  
 `month_end$str$0` - will get the current month end date in `yyyymmdd` format
+
+## Pre Installed Store Procedures
+There are four pre installed SPs to create Jobs, Steps and Params. Here is the interface of calling these SPs.
+
+```sql
+
+CALL WBTEQ_C_JOB(
+	'JOB ABC' 	    -- JOB_NAME
+,	'D'			    -- FREQ
+,	NULL		    -- DAY OF MONTH
+,	NULL		    -- DAY OF WEEK
+,	NULL		    -- HOUR
+,	'Owner'	        -- OWNER
+,	'email@addr'	-- EMAIL
+,	Message
+);
+
+CALL WBTEQ_C_Step(
+	5               -- Existing job id
+,	10              -- Seq number
+,	'filename.abc'  -- script file name
+,	Message
+);
+
+CALL WBTEQ_C_Param(
+	111             -- Existing step id
+,	'P'             -- Parameter type, D / P / S
+,	'param_name'    -- the value to be replaced
+,	'param_value'   -- the actual value / formula / function
+,	Message
+);
+
+CALL WBTEQ_D_Job(
+	5               -- The job ID to be deleted, CASCADE mode
+,	Message
+);
+```
 
 ## Usage
 ```
