@@ -366,7 +366,6 @@ def command_line_runner():
             # TODO:
             pass
 
-
     for cmd_email in command_files:
         cmd, email = cmd_email
         abs_cmd = _get_full_path(cmd)
@@ -377,10 +376,11 @@ def command_line_runner():
             # rcode = 0
             if rcode == 0:
                 logger.info('Calling {} successful'.format(abs_cmd))
+
             else:
                 logger.warning('Failed to call {}'.format(abs_cmd))
             logger.info('Sending email for {} to {}'.format(abs_cmd, email))
-            send_notification(abs_cmd, email)
+            send_notification(rcode, abs_cmd, email)
 
 
 if __name__ == '__main__':

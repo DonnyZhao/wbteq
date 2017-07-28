@@ -3,42 +3,55 @@
 This is the module to parse log and send email notification
 """
 
-import smtplib
 from os.path import basename
-from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import COMMASPACE, formatdate
+import os
+import win32com.client as win32
+import re
 
 
-def send_mail(send_from, send_to, subject, text, files=None,
-              server="authsmtp.thewestpacgroup.com.au",
-              username="corpau\M043944",
-              password="Feb@2017"):
-    assert isinstance(send_to, list)
+def deliver_email(email_addr, subject, body, attached_files=[]):
+    """
+    Delivery email by launch outlook
+    """
+    if not isinstance(attached_files, list):
+        raise TypeError('please give file path as list')
 
-    msg = MIMEMultipart()
-    msg['From'] = send_from
-    msg['To'] = COMMASPACE.join(send_to)
-    msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = subject
+    outlook = win32.Dispatch('outlook.application')
+    mail = outlook.CreateItem(0)
+    mail.To = email_addr
+    mail.Subject = subject
+    mail.Body = 'This is an automatic email from WBTEQ'
+    mail.HTMLBody = """This is an automatic email from <a href="https://github.com/zhongdai/wbteq">WBTEQ</a>"""
 
-    msg.attach(MIMEText(text))
-
-    for f in files or []:
-        with open(f, "rb") as fil:
-            part = MIMEApplication(
-                fil.read(),
-                Name=basename(f)
-            )
-            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(f)
-            msg.attach(part)
+    #In case you want to attach a file to the email
+    if len(attached_files) > 0:
+        for f_path in attached_files:
+            mail.Attachments.Add(f_path)
+    mail.Send()
 
 
-    smtp = smtplib.SMTP(server)
-    smtp.login(username,password)
-    smtp.sendmail(send_from, send_to, msg.as_string())
-    smtp.close()
+def send_notification(rcode, cmd_file, emails):
+    if rcode != 0:
+        title = '[Error: {}]'.format(rcode) + basename(cmd_file)
+    else:
+        title = '[Success]' + basename(cmd_file)
 
-def send_notification(cmd_file, emails):
-    pass
+    curr_dir = os.getcwd()
+    attach_file_list = []
+    # .cmd file is not able to be attached
+    # attach_file_list.append(cmd_file)
+
+    lines = [x.strip() for x in open(cmd_file) if x.startswith('bteq')]
+    for line in lines:
+        bteq_file = line.split('<')[1].split('>>')[0].strip()
+        attach_file_list.append(os.path.join(curr_dir,bteq_file))
+
+        log_file = os.path.join(curr_dir,line.split('>>')[1].strip())
+        # the log file name must be duplicated in the file
+        if log_file not in attach_file_list:
+            attach_file_list.append(log_file)
+
+    print('title:{}'.format(title))
+    print('email:{}'.format(emails))
+    print('logs:{}'.format('\n'.join(attach_file_list)))
+    deliver_email(emails, title, 'body', attach_file_list)
