@@ -118,7 +118,8 @@ CALL WBTEQ_D_Job(
 
 ## Usage
 ```
-usage: wbteq [-h] [-l LIB] [-f FOLDER] [-d DAYS] [-v] username password
+usage: wbteq [-h] [-l LIB] [-f FOLDER] [-d DAYS] [-t] [-e] [-v]
+             username password
 
 BTEQ Jobs management on Windows
 
@@ -132,6 +133,8 @@ optional arguments:
   -f FOLDER, --folder FOLDER
                         The working folder for WBTEQ (default _wbteq)
   -d DAYS, --days DAYS  The # of days to keep logs/scripts (default 7)
+  -t, --test            The flag to run as TEST mode, default is False
+  -e, --exec            The flag to execute BTEQ, only for production mode
   -v, --version         displays the current version of wbteq
 ```
 

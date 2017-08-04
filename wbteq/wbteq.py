@@ -87,12 +87,18 @@ def _delete_older_files(wf, no_of_days):
                 logger.info('{} has been deleted'.format(_file))
     return counter
 
-def get_all_jobs(cursor):
+def get_all_jobs(cursor, test_flag):
     """
     Query the jobs table, and return valid jobs
     TODO Need to use ENV for schema
     """
     return_jobs = []
+    if test_flag is False:
+        is_enabled_value = 'Y'
+        logger.info('Running on **Production** mode')
+    else:
+        is_enabled_value = 'T'
+        logger.info('Running on **Test** mode')
     sql_fetch_jobs = """
                     select
                     	job_id
@@ -103,12 +109,12 @@ def get_all_jobs(cursor):
                     ON   c.Calendar_date = Current_Date
 
                     where
-                    	j.is_enabled = 'Y'
+                    	j.is_enabled = '{tf}'
                     and (
                     		j.freq = 'D'
                     	OR (j.freq = 'M' and c.day_of_month = j.day_of_month)
                     	OR (j.freq = 'W' and c.day_of_week = j.day_of_week)
-                    	);"""
+                    	);""".format(tf=is_enabled_value)
 
     logger.info('Running SQL Query for jobs')
     cursor.execute(sql_fetch_jobs)
@@ -177,13 +183,13 @@ def _check_job_files(lib_folder, files):
     else:
         raise TypeError('files must be a str or list')
 
-def build_job_def_list(lib_folder, user, password):
+def build_job_def_list(lib_folder, user, password, test_flag):
     logger.info('Connecting to database ...')
 
     conn = pyodbc.connect(TERADATA_DSN.format(u=user,p=password))
     cursor = conn.cursor()
 
-    jobs = get_all_jobs(cursor)
+    jobs = get_all_jobs(cursor, test_flag)
     steps = get_all_steps(cursor)
     params = get_all_params(cursor)
 
@@ -311,6 +317,11 @@ def get_parser():
                         help='The # of days to keep logs/scripts (default 7)',
                         action='store')
 
+    parser.add_argument('-t','--test', default=False,
+                        help='The flag to run as TEST mode, default is False',
+                        action='store_true')
+
+
     parser.add_argument('-e','--exec', default=False,
                         help='The flag to execute BTEQ, only for production mode',
                         action='store_true')
@@ -346,7 +357,8 @@ def command_line_runner():
     # it checks of the job file exists or not
     jobs = build_job_def_list(_get_full_path(args['lib']),
                               user=args['username'],
-                              password=args['password'])
+                              password=args['password'],
+                              test_flag=args['test'])
 
     logger.info('[{}] valid job(s) has been found'.format(len(jobs)))
     for j in jobs:

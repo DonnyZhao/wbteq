@@ -14,3 +14,7 @@
 - Added the workflow.png
 - Added WBTEQ_DB_NAME to avoid hard code
 - Prepare to deploy for a real process
+
+0.1.1
+-----
+- Added the Test mode, -t (--test) to fetch test jobs
