@@ -19,8 +19,8 @@ create table wbteq_jobs
 ,	hour24				integer
 ,	job_name			varchar(30) not null
 ,	job_owner			varchar(10) not null
-,	job_owner_email		varchar(100) not null
-,	is_enabled 			char(1) not null compress ('Y','N')
+,	job_owner_email		varchar(2000) not null  -- single email, or separated by ;
+,	is_enabled 			char(1) not null compress ('Y','N', 'T') -- 'T' for test, only when -t or --test
 ,	created_at			date not null
 ,	updated_at			date not null
 ) unique primary index (job_id);
@@ -59,7 +59,7 @@ REPLACE PROCEDURE WBTEQ_C_JOB(
 ,	IN	Day_Of_Week		Integer
 ,	IN	Hour24			Integer
 ,	IN	Job_Owner		Varchar(10)
-,	IN	Job_Owner_Email	Varchar(100)
+,	IN	Job_Owner_Email	Varchar(2000) -- single email, or separated by ;
 ,	OUT Message			Varchar(100)
 ) 
 
