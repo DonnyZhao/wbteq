@@ -14,7 +14,23 @@ def udf_call(command):
     fund_library = {}
     def month_end(fmt='str', offset=0):
         today = datetime.now()
-        next_month_begin = date(today.year, (today.month + 1 + offset) % 12, 1)
+        new_month = today.month + 1 + offset
+        if new_month <= 12 and new_month > 0:
+            m = today.month + 1 + offset
+            y = today.year
+        elif new_month == 0:
+            m = 12
+            y = today.year - 1
+        elif new_month > 12:
+            delta_y = int(new_month / 12)
+            m = new_month % 12
+            y = today.year + delta_y
+        else:
+            # return the current month end if go back to far
+            m = today.month + 1
+            y = today.year
+
+        next_month_begin = date(y, m, 1)
         one_day = timedelta(days=-1)
         month_end_date = next_month_begin + one_day
         if fmt == 'str':
