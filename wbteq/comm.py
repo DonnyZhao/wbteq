@@ -5,7 +5,10 @@ This is the module to parse log and send email notification
 
 from os.path import basename
 import os
-import win32com.client as win32
+try:
+    import win32com.client as win32
+except ImportError as e:
+    pass
 import re
 
 
@@ -21,7 +24,7 @@ def deliver_email(email_addr, subject, body, attached_files=[]):
     mail.To = email_addr
     mail.Subject = subject
     mail.Body = 'This is an automatic email from WBTEQ'
-    mail.HTMLBody = """This is an automatic email from <a href="https://github.com/zhongdai/wbteq">WBTEQ</a>"""
+    mail.HTMLBody = """This is an automatic email from WBTEQ"""
 
     #In case you want to attach a file to the email
     if len(attached_files) > 0:

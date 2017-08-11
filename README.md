@@ -5,18 +5,18 @@
 
 ---
 
-Welcome to the project **WBTEQ**, I supppose you are struggling with how to run BTEQ scripts on Windows platform, then you are on the right page.
+Welcome to the project **WBTEQ**, I suppose you are struggling with how to run BTEQ scripts on Windows platform, then you are on the right page.
 
-The purpose of this project is to make life easier to run BTEQ scripts on Windows. To test/intall/deploy **WBTEQ**, here are the basic requirement:
+The purpose of this project is to make life easier to run BTEQ scripts on Windows. To test/install/deploy **WBTEQ**, here are the basic requirement:
 
-* You need a Windows machine, and you have the permission to install `pip` package, you also need to create Envrionment Variable
-* You need the Teradata Utility installed on that machine, try to run `bteq` command from console
-* You have the connection detial of a Teradata server, and you have the write permission to at least one schema
-* Python 3.5+ is required, and `pyodbc` - https://github.com/mkleehammer/pyodbc is intalled
+* You need a computer with Windows OS. Your account should have the permission to install `pip` packages, and the permission to create Environment Variables
+* You need the Teradata Utility installed on that computer, try to run `bteq` command from console to test it
+* You have the connection detail of a Teradata server, and you have the write permission to at least one schema
+* Python 3.5+ is required, and `pyodbc` - https://github.com/mkleehammer/pyodbc is installed
 
 ## How to install
 
-* The first task, create two new envrionment variables  
+* The first task, create two new environment variables
 `WBTEQ_DB_NAME` - the database name you have write permission  
 `WBTEQ_DB_URL` - database URL
 * Find the file `system_tables_ddl.sql` and execute the SQLs to create system tables and SPs on Teradata
@@ -30,19 +30,20 @@ The purpose of this project is to make life easier to run BTEQ scripts on Window
 
 TODO: A ER diagram is required
 
-There are three tables in Teradata to store the information about BTEQ jobs. Use SQL query to get the jobs to be run, check `freq`,`is_enabled` and compare to current date/time to decided if the job to be run.
+There are three tables in Teradata to store the information about WBTEQ jobs. The **WBTEQ** command will be scheduled to run every day, and it checkes the `wbteq_jobs` table to see if any jobs need to be run as of today. The rules are simple,
+* Production mode - It checks the `is_enabled` and if the `day_of_month` or `day_of_week` matches current date
+* Test mode - It only checks the `is_enabled = 'T'`, no matter other set up
 
-This program will be scheduled as a repeated job for every 1 hour, and it invokes all other BTEQ jobs.
-
+Here is the table definition,  
 ### wbteq_jobs
 - job_id `pk`
-- freq ('M','W','D')
+- freq ('M' - monthly,'W' - weekly, 'D' - everyday)
 - day_of_month
 - day_of_week
-- hour24
+- hour24 (Not supported yet)
 - job_name
 - job_owner
-- job_owner_email
+- job_owner_email (single email addr or separated by ';')
 - is_enabled ('Y','N')
 - created_at
 - updated_at
