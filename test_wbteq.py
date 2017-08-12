@@ -6,6 +6,9 @@ import unittest
 import pyodbc
 from datetime import datetime
 
+os.environ['WBTEQ_DB_URL'] = 'DBURL'
+os.environ['WBTEQ_DB_NAME'] = 'DBNAME'
+
 from wbteq import wbteq
 from wbteq import udf
 
