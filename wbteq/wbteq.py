@@ -17,13 +17,9 @@ from . import __version__
 from .udf import udf_call
 from .comm import send_notification
 
-
-
-
 Job = namedtuple('Job',['job_id','job_name','job_email'])
 Step = namedtuple('Step',['job_id','step_id','filename','seq_num'])
 Param = namedtuple('Param',['step_id','param_name','param_value'])
-
 
 # Setup the logger
 logger = logging.getLogger('WBTEQ')
